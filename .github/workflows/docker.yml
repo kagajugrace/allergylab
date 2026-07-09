@@ -1,43 +1,63 @@
-name: AllergyLab CI/CD
+name: AllergyLab CI
 
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v2
+    - name: docker build web-app
+      run: docker build ./app -t kagaju12/al-app:latest
+    - name: docker build db-loader
+      run: docker build ./db-loader -t kagaju12/al-db-loader:latest
+    - name: docker build email
+      run: docker build ./email -t kagaju12/al-email:latest
 
-      - name: Build images
-        run: |
-          cd Part7a
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/al-app:latest ./app
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/al-db-loader:latest ./db-loader
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/al-email:latest ./email
 
-      - name: Log in to Docker
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Push images to DockerHub
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/al-app:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/al-db-loader:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/al-email:latest
 
-  deploy:
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: '**PLACEHOLDER** Deploy to Kubernetes'
-        run: echo Placeholder for Deployment
 
-      - name: Run containers
-        run: |
-          docker run -d ${{ secrets.DOCKER_USERNAME }}/al-app:latest
-          docker run -d ${{ secrets.DOCKER_USERNAME }}/al-db-loader:latest
-          docker run -d ${{ secrets.DOCKER_USERNAME }}/al-email:latest
+# name: AllergyLab CI/CD
+
+# on: [push]
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout source
+#         uses: actions/checkout@v4
+
+#       - name: Build images
+#         run: |
+#           cd Part7a
+#           docker build -t ${{ secrets.DOCKER_USERNAME }}/al-app:latest ./app
+#           docker build -t ${{ secrets.DOCKER_USERNAME }}/al-db-loader:latest ./db-loader
+#           docker build -t ${{ secrets.DOCKER_USERNAME }}/al-email:latest ./email
+
+#       - name: Log in to Docker
+#         uses: docker/login-action@v3
+#         with:
+#           username: ${{ secrets.DOCKER_USERNAME }}
+#           password: ${{ secrets.DOCKER_TOKEN }}
+
+#       - name: Push images to DockerHub
+#         run: |
+#           docker push ${{ secrets.DOCKER_USERNAME }}/al-app:latest
+#           docker push ${{ secrets.DOCKER_USERNAME }}/al-db-loader:latest
+#           docker push ${{ secrets.DOCKER_USERNAME }}/al-email:latest
+
+#   deploy:
+#     needs: [build]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: '**PLACEHOLDER** Deploy to Kubernetes'
+#         run: echo Placeholder for Deployment
+
+#       - name: Run containers
+#         run: |
+#           docker run -d ${{ secrets.DOCKER_USERNAME }}/al-app:latest
+#           docker run -d ${{ secrets.DOCKER_USERNAME }}/al-db-loader:latest
+#           docker run -d ${{ secrets.DOCKER_USERNAME }}/al-email:latest
